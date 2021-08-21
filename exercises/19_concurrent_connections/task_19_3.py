@@ -42,8 +42,46 @@ router ospf 1
 
 # Этот словарь нужен только для проверки работа кода, в нем можно менять IP-адреса
 # тест берет адреса из файла devices.yaml
-commands = {
-    "192.168.100.3": "sh run | s ^router ospf",
-    "192.168.100.1": "sh ip int br",
-    "192.168.100.2": "sh int desc",
-}
+
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+from datetime import datetime
+from netmiko import ConnectHandler
+import yaml
+
+def send_show_command(devices, commands):
+    #host = device["host"]
+    if type(commands) == str:
+        commands = [commands]
+    cmd_dict = {}
+    with ConnectHandler(**devices) as ssh:
+        ssh.enable()
+        for cmd in commands:
+          output = ssh.send_command(cmd)
+          prompt = ssh.find_prompt()
+          output = prompt + cmd + "\n" + ssh.send_command(cmd)
+    return output
+
+def send_command_to_devices(devices, commands_dict, filename, limit=3):
+  result_dict = {}
+  with ThreadPoolExecutor(max_workers=limit) as executor:
+    future_list = [ executor.submit(send_show_command, dev, commands_dict[dev["host"]]) for dev in devices]
+    with open(filename, "w") as file:
+      for f in as_completed(future_list):
+        output = f.result()
+        file.write(f"{output}\n")
+
+
+if __name__ == "__main__":
+  start_time = datetime.now()
+  commands = {
+      "192.168.100.3": "sh run | s ^router ospf",
+      "192.168.100.1": "sh ip int br",
+      "192.168.100.2": "sh int desc",
+  }
+  filename = "show_dev_commands.txt"
+  with open("devices.yaml") as f:
+      devices = yaml.safe_load(f)
+      send_command_to_devices(devices, commands, filename)
+  print(datetime.now() - start_time)
