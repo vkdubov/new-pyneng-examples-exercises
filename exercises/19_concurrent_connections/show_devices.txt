@@ -1,0 +1,19 @@
+R1#sh ip int br
+Interface                  IP-Address      OK? Method Status                Protocol
+Ethernet0/0                192.168.100.1   YES manual up                    up      
+Ethernet0/1                unassigned      YES unset  administratively down down    
+Ethernet0/2                unassigned      YES unset  administratively down down    
+Ethernet0/3                unassigned      YES unset  administratively down down    
+Loopback100                10.1.1.100      YES manual up                    up      
+R2#sh ip int br
+Interface                  IP-Address      OK? Method Status                Protocol
+Ethernet0/0                192.168.100.2   YES manual up                    up      
+Ethernet0/1                unassigned      YES unset  administratively down down    
+Ethernet0/2                unassigned      YES unset  administratively down down    
+Ethernet0/3                unassigned      YES unset  administratively down down    
+R3#sh ip int br
+Interface                  IP-Address      OK? Method Status                Protocol
+Ethernet0/0                192.168.100.3   YES manual up                    up      
+Ethernet0/1                unassigned      YES unset  administratively down down    
+Ethernet0/2                unassigned      YES unset  administratively down down    
+Ethernet0/3                unassigned      YES unset  administratively down down    
